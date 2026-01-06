@@ -1,0 +1,20 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Uploads & logs
+uploads/
+logs/*.log
+*.log
+
+# OS files
+.DS_Store
+
+# Test coverage
+coverage/
+
+# Build outputs
+dist/
+build/

@@ -1,0 +1,49 @@
+{
+  "name": "lakshmi-silver-backend",
+  "version": "1.0.0",
+  "description": "Backend for Lakshmi Silver E-commerce",
+  "main": "server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.js\""
+  },
+  "keywords": [
+    "ecommerce",
+    "silver",
+    "jewelry"
+  ],
+  "author": "Rahul Wagh",
+  "license": "Chintamani Developer",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.8.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^7.0.12",
+    "razorpay": "^2.9.6",
+    "redis": "^5.10.0",
+    "twilio": "^5.11.1",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4"
+  }
+}
