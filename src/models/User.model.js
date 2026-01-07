@@ -84,7 +84,6 @@ const userSchema = new mongoose.Schema(
 /* ===========================
    Indexes
 =========================== */
-
 userSchema.index({ createdAt: -1 });
 
 /* ===========================
@@ -95,20 +94,15 @@ userSchema.virtual("fullName").get(function () {
 });
 
 /* ===========================
-   Hooks
+   Hooks (Mongoose v7 SAFE)
 =========================== */
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  try {
-    const salt = await bcrypt.genSalt(
-      Number(process.env.BCRYPT_ROUNDS) || 10
-    );
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
+  const salt = await bcrypt.genSalt(
+    Number(process.env.BCRYPT_ROUNDS) || 10
+  );
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 /* ===========================
