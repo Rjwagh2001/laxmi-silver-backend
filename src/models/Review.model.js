@@ -62,7 +62,6 @@ const reviewSchema = new mongoose.Schema(
 
 // Fast listing
 reviewSchema.index({ productId: 1, createdAt: -1 });
-reviewSchema.index({ userId: 1 });
 reviewSchema.index({ isApproved: 1 });
 
 // One review per user per product
