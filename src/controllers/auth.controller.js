@@ -11,13 +11,13 @@ const {
 } = require("../utils/generateToken");
 
 /* =====================================================
-   COOKIE OPTIONS (FIXED FOR CROSS-SITE)
+   COOKIE OPTIONS (CROSS-SITE SAFE)
 ===================================================== */
 const refreshTokenCookieOptions = {
   httpOnly: true,
-  secure: true,       // REQUIRED on HTTPS
-  sameSite: "none",   // REQUIRED for Vercel ↔ Render
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  secure: true,        // REQUIRED for HTTPS (Vercel + Render)
+  sameSite: "none",    // REQUIRED for cross-domain
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
 /* =====================================================
@@ -55,7 +55,11 @@ const register = asyncHandler(async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: "Verify Your Email - Lakshmi Silver",
-      html: `<p>Verify your email: <a href="${verificationUrl}">Verify</a></p>`,
+      html: `
+        <h3>Welcome to Lakshmi Silver</h3>
+        <p>Please verify your email:</p>
+        <a href="${verificationUrl}">Verify Email</a>
+      `,
     });
   } catch (err) {
     console.error("Email error:", err);
@@ -73,6 +77,35 @@ const register = asyncHandler(async (req, res) => {
       "Registered successfully. Please verify your email."
     )
   );
+});
+
+/* =====================================================
+   VERIFY EMAIL ✅ FIXED
+===================================================== */
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    throw new ApiError(400, "Verification token is required");
+  }
+
+  const user = await User.findOne({
+    verificationToken: token,
+    verificationTokenExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired verification token");
+  }
+
+  user.isVerified = true;
+  user.verificationToken = undefined;
+  user.verificationTokenExpiry = undefined;
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Email verified successfully"));
 });
 
 /* =====================================================
@@ -118,7 +151,7 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 /* =====================================================
-   GET ME
+   GET CURRENT USER
 ===================================================== */
 const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -132,10 +165,11 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user)
+  if (!user) {
     return res
       .status(200)
       .json(new ApiResponse(200, null, "If user exists, email sent"));
+  }
 
   const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -155,9 +189,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
     html: `<a href="${resetUrl}">Reset Password</a>`,
   });
 
-  res.status(200).json(
-    new ApiResponse(200, null, "Password reset email sent")
-  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password reset email sent"));
 });
 
 /* =====================================================
@@ -183,9 +217,9 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.resetPasswordExpiry = undefined;
   await user.save();
 
-  res.status(200).json(
-    new ApiResponse(200, null, "Password reset successful")
-  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password reset successful"));
 });
 
 /* =====================================================
@@ -202,13 +236,13 @@ const changePassword = asyncHandler(async (req, res) => {
   user.password = newPassword;
   await user.save();
 
-  res.status(200).json(
-    new ApiResponse(200, null, "Password changed successfully")
-  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password changed successfully"));
 });
 
 /* =====================================================
-   REFRESH TOKEN
+   REFRESH ACCESS TOKEN
 ===================================================== */
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -220,16 +254,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const accessToken = generateAccessToken(user._id);
 
-  res.status(200).json(
-    new ApiResponse(200, { accessToken }, "Token refreshed")
-  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, { accessToken }, "Token refreshed"));
 });
 
 /* =====================================================
-   EXPORTS
+   EXPORTS ✅ ALL MATCH ROUTES
 ===================================================== */
 module.exports = {
   register,
+  verifyEmail,
   login,
   logout,
   getMe,

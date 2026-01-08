@@ -14,9 +14,9 @@ const protect = asyncHandler(async (req, res, next) => {
     token = req.headers.authorization.split(' ')[1];
   }
 
-  // Check for token in cookies
-  if (!token && req.cookies.token) {
-    token = req.cookies.token;
+  // ✅ FIX: Check correct cookie name (refreshToken)
+  if (!token && req.cookies.refreshToken) {
+    token = req.cookies.refreshToken;
   }
 
   // Check if token exists
